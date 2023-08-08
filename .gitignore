@@ -1,2 +1,4 @@
 .db
 .tmp
+eclipse-formatter.xml
+.vscode
