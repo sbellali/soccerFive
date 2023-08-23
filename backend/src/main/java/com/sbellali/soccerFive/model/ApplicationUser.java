@@ -1,5 +1,6 @@
 package com.sbellali.soccerFive.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +13,6 @@ import jakarta.persistence.Table;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import org.hibernate.id.IntegralDataTypeHolder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -24,16 +24,15 @@ public class ApplicationUser implements UserDetails {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
 
+  @Column(unique = true, nullable = false)
   private String username;
 
+  @Column(unique = true, nullable = false)
   private String password;
 
   @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(
-    name = "user_role_junction",
-    joinColumns = { @JoinColumn(name = "user_id") },
-    inverseJoinColumns = { @JoinColumn(name = "role_name") }
-  )
+  @JoinTable(name = "user_role_junction", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = {
+      @JoinColumn(name = "role_name") })
   private Set<Role> authorities;
 
   public ApplicationUser() {
@@ -42,11 +41,10 @@ public class ApplicationUser implements UserDetails {
   }
 
   public ApplicationUser(
-    Integer id,
-    String username,
-    String password,
-    Set<Role> authorities
-  ) {
+      Integer id,
+      String username,
+      String password,
+      Set<Role> authorities) {
     this.id = id;
     this.username = username;
     this.password = password;
