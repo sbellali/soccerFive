@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -10,7 +11,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(private formBuilder: FormBuilder, private authService: AuthService) {}
 
   form = this.formBuilder.nonNullable.group({
     username: ["", [Validators.required, Validators.pattern(/^\w{4,10}$/)]],
@@ -20,7 +21,9 @@ export class LoginComponent {
   error= "";
 
   onSubmit() {
-    console.log("SUBMIT: ", this.form.value)
+    const {username, password} = this.form.getRawValue();
+    this.authService.login(username, password);
+
   }
 
   createAccount() {
