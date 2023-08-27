@@ -3,17 +3,25 @@ package com.sbellali.soccerFive.service;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sbellali.soccerFive.dto.ErrorMessage;
 import com.sbellali.soccerFive.dto.LoginResponseDTO;
-import com.sbellali.soccerFive.model.ApplicationUser;
+import com.sbellali.soccerFive.dto.UserDTO;
+import com.sbellali.soccerFive.model.User;
 import com.sbellali.soccerFive.model.Role;
 import com.sbellali.soccerFive.repository.RoleRepository;
 import com.sbellali.soccerFive.repository.UserRepository;
@@ -37,21 +45,35 @@ public class AuthenticationService {
     @Autowired
     private TokenService tokenService;
 
-    public LoginResponseDTO LoginUser(String username, String password) {
-        try {
+    @Autowired
+    private ModelMapper modelMapper;
 
+    public ResponseEntity<?> LoginUser(String username, String password) {
+        try {
             Authentication auth = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            System.out.println(auth);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            User currentUser = (User) auth.getPrincipal();
             String token = tokenService.generateJwt(auth);
+            return ResponseEntity.ok().body(
+                    new LoginResponseDTO(modelMapper.map(currentUser, UserDTO.class), token));
+        } catch (BadCredentialsException | DisabledException | LockedException e) {
+            HttpStatus httpStatus = HttpStatus.FORBIDDEN;
+            if (e instanceof DisabledException) {
+                httpStatus = HttpStatus.FORBIDDEN;
+            }
+            if (e instanceof LockedException) {
+                httpStatus = HttpStatus.LOCKED;
+            }
 
-            return new LoginResponseDTO(userRepository.findByUsername(username).get(), token);
-        } catch (AuthenticationException e) {
-            return new LoginResponseDTO(null, "");
+            return ResponseEntity
+                    .status(httpStatus)
+                    .body(new ErrorMessage(httpStatus.value(), e.getMessage()));
         }
+
     }
 
-    public ApplicationUser registerUser(String username, String password) {
+    public UserDTO registerUser(String username, String email, String password) {
         String encodedPassword = passwordEncoder.encode(password);
         Role userRole = roleRepository.findByAuthority("USER").get();
 
@@ -59,7 +81,8 @@ public class AuthenticationService {
 
         authorities.add(userRole);
 
-        return userRepository.save(new ApplicationUser(0, username, encodedPassword, authorities));
+        User createdUser = userRepository.save(new User(0, username, email, encodedPassword, authorities));
+        return modelMapper.map(createdUser, UserDTO.class);
     }
 
 }

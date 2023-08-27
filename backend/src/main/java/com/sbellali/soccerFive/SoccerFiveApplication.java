@@ -3,13 +3,14 @@ package com.sbellali.soccerFive;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.sbellali.soccerFive.model.ApplicationUser;
+import com.sbellali.soccerFive.model.User;
 import com.sbellali.soccerFive.model.Role;
 import com.sbellali.soccerFive.repository.RoleRepository;
 import com.sbellali.soccerFive.repository.UserRepository;
@@ -19,6 +20,11 @@ public class SoccerFiveApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SoccerFiveApplication.class, args);
+	}
+
+	@Bean
+	public ModelMapper modelMapper() {
+		return new ModelMapper();
 	}
 
 	@Bean
@@ -33,7 +39,7 @@ public class SoccerFiveApplication {
 			Set<Role> roles = new HashSet<>();
 			roles.add(adminRole);
 
-			ApplicationUser admin = new ApplicationUser(1, "admin", passwordEncoder.encode("password"), roles);
+			User admin = new User(1, "admin", "admin@soccerFive.com", passwordEncoder.encode("password"), roles);
 			userRepository.save(admin);
 		};
 	}

@@ -18,7 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "users")
-public class ApplicationUser implements UserDetails {
+public class User implements UserDetails {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -28,6 +28,9 @@ public class ApplicationUser implements UserDetails {
   private String username;
 
   @Column(unique = true, nullable = false)
+  private String email;
+
+  @Column(unique = true, nullable = false)
   private String password;
 
   @ManyToMany(fetch = FetchType.EAGER)
@@ -35,18 +38,32 @@ public class ApplicationUser implements UserDetails {
       @JoinColumn(name = "role_name") })
   private Set<Role> authorities;
 
-  public ApplicationUser() {
+  @Column()
+  private boolean accountNonExpired = true;
+
+  @Column()
+  private boolean accountNonLocked = true;
+
+  @Column()
+  private boolean credentialsNonExpired = true;
+
+  @Column()
+  private boolean accountEnabled = true;
+
+  public User() {
     super();
     this.authorities = new HashSet<Role>();
   }
 
-  public ApplicationUser(
+  public User(
       Integer id,
       String username,
+      String email,
       String password,
       Set<Role> authorities) {
     this.id = id;
     this.username = username;
+    this.email = email;
     this.password = password;
     this.authorities = authorities;
   }
@@ -86,23 +103,47 @@ public class ApplicationUser implements UserDetails {
     this.username = username;
   }
 
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
   @Override
   public boolean isAccountNonExpired() {
-    return true;
+    return this.accountNonExpired;
+  }
+
+  public void setAccountNonExpired(boolean accountNonExpired) {
+    this.accountNonExpired = accountNonExpired;
   }
 
   @Override
   public boolean isAccountNonLocked() {
-    return true;
+    return this.accountNonLocked;
+  }
+
+  public void setAccountNonLocked(boolean accountNonLocked) {
+    this.accountNonLocked = accountNonLocked;
   }
 
   @Override
   public boolean isCredentialsNonExpired() {
-    return true;
+    return this.credentialsNonExpired;
+  }
+
+  public void setCredentialsNonExpired(boolean credentialsNonExpired) {
+    this.credentialsNonExpired = credentialsNonExpired;
   }
 
   @Override
   public boolean isEnabled() {
-    return true;
+    return this.accountEnabled;
+  }
+
+  public void setAccountEnabled(boolean accountEnabled) {
+    this.accountEnabled = accountEnabled;
   }
 }

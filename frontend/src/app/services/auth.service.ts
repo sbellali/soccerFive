@@ -1,30 +1,45 @@
 import { Injectable } from '@angular/core';
-import { AuthClient } from '../clients/auth.client';
 import { Router } from '@angular/router';
-
-const USER_STORAGE_KEY = "APP_TOKEN";
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { USER_STORAGE_KEY, environment } from 'src/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private authClient: AuthClient, private router: Router) { }
+  constructor(private router: Router, private httpClient: HttpClient) { }
 
-  public login(username: string, password: string): void {
-    this.authClient.login(username, password).subscribe((token) => {
-      localStorage.setItem(USER_STORAGE_KEY, token);
-      this.router.navigateByUrl('/home')
+
+  private authHttpCall(prefix: string, body: any): Observable<any> {
+    return this.httpClient.post(
+        `${environment.apiUrl}/auth/${prefix}`,
+        body,
+        {responseType : "json"}
+    );
+  }
+
+  public login(username:string, password:string): void {
+    this.authHttpCall('login', {username, password}).subscribe({
+        next: (res: {user: any, token: string}) => {
+          this.storeToken(res.token)
+          this.router.navigateByUrl('/');
+        }
     })
   }
 
-  public register(username: string, password: string): void {
-    this.authClient.register(username, password).subscribe((token) => this.router.navigateByUrl('/'))
+  public register(username:string, email:string, password:string): void {
+    this.authHttpCall('register', {username, email, password}).subscribe({
+      next: () => {
+        this.login(username, password)
+      }
+  })
   }
 
   public logout(): void {
     localStorage.removeItem(USER_STORAGE_KEY);
-    this.router.navigateByUrl('/')
+    this.router.navigateByUrl('/login')
   }
 
   public isLoggedIn(): boolean {
@@ -36,5 +51,7 @@ export class AuthService {
     return this.isLoggedIn() ? localStorage.getItem(USER_STORAGE_KEY) : null;
   }
 
-  
+  public storeToken(token: any): void {
+    localStorage.setItem(USER_STORAGE_KEY, token);
+  }
 }
