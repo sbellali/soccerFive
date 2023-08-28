@@ -3,11 +3,12 @@ import { RouterModule, Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { RegisterComponent } from './pages/register/register.component';
 import { HomeComponent } from './pages/home/home.component';
+import { LoginComponent } from './pages/login/login.component';
 
 const routes: Routes = [
   {
     path: "login",
-    loadComponent: () => import("./pages/login/login.component").then((module) => module.LoginComponent),
+    component: LoginComponent,
   },
   {
     path: "register",
