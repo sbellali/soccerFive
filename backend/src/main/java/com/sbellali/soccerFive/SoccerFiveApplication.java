@@ -39,7 +39,7 @@ public class SoccerFiveApplication {
 			Set<Role> roles = new HashSet<>();
 			roles.add(adminRole);
 
-			User admin = new User(1, "admin", "admin@soccerFive.com", passwordEncoder.encode("password"), roles);
+			User admin = new User("admin", "admin@soccerFive.com", passwordEncoder.encode("password"), roles);
 			userRepository.save(admin);
 		};
 	}

@@ -73,16 +73,25 @@ public class AuthenticationService {
 
     }
 
-    public UserDTO registerUser(String username, String email, String password) {
+    public ResponseEntity<?> registerUser(String username, String email, String password) {
+        if (this.userRepository.existsByUsername(username) || this.userRepository.existsByEmail(email)) {
+            HttpStatus httpStatus = HttpStatus.CONFLICT;
+            return ResponseEntity
+                    .status(httpStatus)
+                    .body(new ErrorMessage(httpStatus.value(), "username or/and email already exit"));
+        }
+        User newUser = userRepository.save(this.createUser(username, email, password));
+        UserDTO newUserDTO = modelMapper.map(newUser, UserDTO.class);
+        return ResponseEntity.ok().body(newUserDTO);
+    }
+
+    private User createUser(String username, String email, String password) {
         String encodedPassword = passwordEncoder.encode(password);
         Role userRole = roleRepository.findByAuthority("USER").get();
-
         Set<Role> authorities = new HashSet<>();
-
         authorities.add(userRole);
 
-        User createdUser = userRepository.save(new User(0, username, email, encodedPassword, authorities));
-        return modelMapper.map(createdUser, UserDTO.class);
+        return new User(username, email, encodedPassword, authorities);
     }
 
 }

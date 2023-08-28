@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthInterceptor } from './interceptor/auth.interceptor';
 import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
+import { NavbarComponent } from './partials/navbar/navbar.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { HttpErrorInterceptor } from './interceptor/http-error.interceptor';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    NavbarComponent
   ],
   providers: [
     {

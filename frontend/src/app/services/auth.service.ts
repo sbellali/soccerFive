@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, map, switchMap, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { USER_STORAGE_KEY, environment } from 'src/environments';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -19,22 +18,21 @@ export class AuthService {
         {responseType : "json"}
     );
   }
+  
 
-  public login(username:string, password:string): void {
-    this.authHttpCall('login', {username, password}).subscribe({
-        next: (res: {user: any, token: string}) => {
-          this.storeToken(res.token)
-          this.router.navigateByUrl('/');
-        }
-    })
+  public login(username:string, password:string): Observable<any> {
+    return this.authHttpCall('login', {username, password}).pipe(
+      tap((res: {user: any, token: string}) => {
+        this.storeToken(res.token)
+        this.router.navigateByUrl('/');
+      })
+    )
   }
 
-  public register(username:string, email:string, password:string): void {
-    this.authHttpCall('register', {username, email, password}).subscribe({
-      next: () => {
-        this.login(username, password)
-      }
-  })
+  public register(username:string, email:string, password:string): Observable<any> {
+    return this.authHttpCall('register', {username, email, password}).pipe(
+      switchMap(() => this.login(username, password))
+    );
   }
 
   public logout(): void {

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router, RouterModule } from '@angular/router';
-import { USER_STORAGE_KEY } from 'src/environments';
+import { assetsPath } from 'src/environments';
 
 @Component({
   selector: 'app-register',
@@ -15,7 +15,8 @@ import { USER_STORAGE_KEY } from 'src/environments';
 export class RegisterComponent {
 
   errorMessage = "";
-
+  logoPath = assetsPath.logo;
+  
   constructor(private formBuilder: FormBuilder, private authService: AuthService, private router: Router) {}
 
   form = this.formBuilder.nonNullable.group({
@@ -30,6 +31,10 @@ export class RegisterComponent {
 
   onSubmit() {
     const {username, email, password} = this.form.getRawValue();
-    this.authService.register(username, email, password);
+    this.authService.register(username, email, password).subscribe({
+      error: (err) => {
+        this.errorMessage = err.error.message || "";
+      }
+    })
   }
 }

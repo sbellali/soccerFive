@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router, RouterModule} from '@angular/router';
+import { assetsPath } from 'src/environments';
 
 
 @Component({
@@ -15,6 +16,7 @@ import { Router, RouterModule} from '@angular/router';
 export class LoginComponent {
   
   errorMessage = "";
+  logoPath = assetsPath.logo;
 
   constructor(private formBuilder: FormBuilder, private authService: AuthService, private router: Router) {}
 
@@ -25,6 +27,10 @@ export class LoginComponent {
 
   onSubmit() {
     const {username, password} = this.form.getRawValue();
-    this.authService.login(username, password);
+    this.authService.login(username, password).subscribe({
+          error: (err) => {
+            this.errorMessage = err.error.message || "";
+          }
+      });
   }
 }
