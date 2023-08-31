@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, map, switchMap, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { USER_STORAGE_KEY, environment } from 'src/environments';
 @Injectable({
