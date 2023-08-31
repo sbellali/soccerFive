@@ -30,8 +30,11 @@ public class User implements UserDetails {
   @Column(unique = true, nullable = false)
   private String email;
 
-  @Column(unique = true, nullable = false)
+  @Column(nullable = false)
   private String password;
+
+  @Column()
+  private String photoUrl = "profile/default";
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "user_role_junction", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = {
@@ -107,6 +110,14 @@ public class User implements UserDetails {
 
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  public String getPhotoUrl() {
+    return photoUrl;
+  }
+
+  public void setPhotoUrl(String photoUrl) {
+    this.photoUrl = photoUrl;
   }
 
   @Override
