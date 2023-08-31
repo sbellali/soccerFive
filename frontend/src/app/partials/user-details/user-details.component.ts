@@ -18,12 +18,7 @@ export class UserDetailsComponent {
   constructor(private userService: UserService, private router: Router, private authService: AuthService){}
 
   ngOnInit(): void {
-    this.userService.getUser(2).subscribe({
-      next: (user) => {this.user = user},
-      error: (error) => {
-        this.router.navigateByUrl('/');
-      }
-    });
+    this.user = this.userService.getUserFromJwt()
   }
 
   logout(): void {
