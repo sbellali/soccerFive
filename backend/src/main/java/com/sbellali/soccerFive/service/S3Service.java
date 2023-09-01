@@ -27,17 +27,17 @@ public class S3Service {
 
     public void putObject(String key, byte[] file) {
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(this.bucketName)
-                .key(key)
-                .build();
+                        .bucket(this.bucketName)
+                        .key(key)
+                        .build();
         this.s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file));
     }
 
     public byte[] getObject(String key) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(this.bucketName)
-                .key(key)
-                .build();
+                        .bucket(this.bucketName)
+                        .key(key)
+                        .build();
         ResponseInputStream<GetObjectResponse> res = this.s3Client.getObject(getObjectRequest);
         try {
             return res.readAllBytes();
@@ -48,9 +48,9 @@ public class S3Service {
 
     public void deleteObject(String key) {
         DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-                .bucket(this.bucketName)
-                .key(key)
-                .build();
+                        .bucket(this.bucketName)
+                        .key(key)
+                        .build();
         this.s3Client.deleteObject(deleteObjectRequest);
     }
 

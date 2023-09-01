@@ -34,11 +34,11 @@ public class User implements UserDetails {
   private String password;
 
   @Column()
-  private String photoUrl = "profile/default";
+  private String photoUrl = "default/profile-image.jpg";
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "user_role_junction", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = {
-      @JoinColumn(name = "role_name") })
+          @JoinColumn(name = "role_name") })
   private Set<Role> authorities;
 
   @Column()
@@ -59,10 +59,10 @@ public class User implements UserDetails {
   }
 
   public User(
-      String username,
-      String email,
-      String password,
-      Set<Role> authorities) {
+          String username,
+          String email,
+          String password,
+          Set<Role> authorities) {
     this.username = username;
     this.email = email;
     this.password = password;

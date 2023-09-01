@@ -51,12 +51,12 @@ public class AuthenticationService {
     public ResponseEntity<?> LoginUser(String username, String password) {
         try {
             Authentication auth = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(username, password));
+                            .authenticate(new UsernamePasswordAuthenticationToken(username, password));
             SecurityContextHolder.getContext().setAuthentication(auth);
             User currentUser = (User) auth.getPrincipal();
             String token = tokenService.generateJwt(auth);
             return ResponseEntity.ok().body(
-                    new LoginResponseDTO(modelMapper.map(currentUser, UserDTO.class), token));
+                            new LoginResponseDTO(modelMapper.map(currentUser, UserDTO.class), token));
         } catch (BadCredentialsException | DisabledException | LockedException e) {
             HttpStatus httpStatus = HttpStatus.FORBIDDEN;
             if (e instanceof DisabledException) {
@@ -67,8 +67,8 @@ public class AuthenticationService {
             }
 
             return ResponseEntity
-                    .status(httpStatus)
-                    .body(new ErrorMessage(httpStatus.value(), e.getMessage()));
+                            .status(httpStatus)
+                            .body(new ErrorMessage(httpStatus.value(), e.getMessage()));
         }
 
     }
@@ -77,8 +77,8 @@ public class AuthenticationService {
         if (this.userRepository.existsByUsername(username) || this.userRepository.existsByEmail(email)) {
             HttpStatus httpStatus = HttpStatus.CONFLICT;
             return ResponseEntity
-                    .status(httpStatus)
-                    .body(new ErrorMessage(httpStatus.value(), "username or/and email already exit"));
+                            .status(httpStatus)
+                            .body(new ErrorMessage(httpStatus.value(), "username or/and email already exit"));
         }
         User newUser = userRepository.save(this.createUser(username, email, password));
         UserDTO newUserDTO = modelMapper.map(newUser, UserDTO.class);

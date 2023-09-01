@@ -29,16 +29,16 @@ public class TokenService {
         User user = (User) auth.getPrincipal();
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
         String scope = auth.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.joining(" "));
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("self")
-                .issuedAt(now)
-                .subject(auth.getName())
-                .claim("roles", scope)
-                .claim("user", userDTO)
-                .build();
+                        .issuer("self")
+                        .issuedAt(now)
+                        .subject(auth.getName())
+                        .claim("roles", scope)
+                        .claim("user", userDTO)
+                        .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 
