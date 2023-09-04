@@ -11,3 +11,11 @@ aws:
     region: eu-west-3
     s3:
         bucket-name: ${AWS_S3_BUCKET_NAME}
+
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      expiration: 86400000 # a day
+      refresh-token:
+        expiration: 604800000 # 7 days
