@@ -26,4 +26,11 @@ export class UserService {
             {responseType : "json"}
         )
     }
+
+    public fetchProfileImage(id: number) {
+        return this.httpClient.get(
+            `${environment.apiUrl}/user/${id}/profile-image`,
+            {responseType : "blob"}
+        )
+    }
 }
