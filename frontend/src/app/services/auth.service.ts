@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, switchMap, tap } from 'rxjs';
+import { Observable, switchMap, tap} from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { USER_STORAGE_KEY, environment } from 'src/environments';
+import jwtDecode from 'jwt-decode';
+import { JwtPayload } from '../entities/JwtPayload';
 @Injectable({
   providedIn: 'root'
 })
@@ -23,7 +25,8 @@ export class AuthService {
   public login(username:string, password:string): Observable<any> {
     return this.authHttpCall('login', {username, password}).pipe(
       tap((res: {user: any, token: string}) => {
-        this.storeToken(res.token)
+        this.storeToken(res.token);
+        this.timerForToken();
         this.router.navigateByUrl('/');
       })
     )
@@ -52,4 +55,24 @@ export class AuthService {
   public storeToken(token: any): void {
     localStorage.setItem(USER_STORAGE_KEY, token);
   }
+
+
+  public timerForToken() {
+    if (this.isLoggedIn()) {
+      const token = this.getToken();
+      const tokenDecoded = jwtDecode<JwtPayload>(token);
+      const now = new Date().getTime();
+      const expireIn = (tokenDecoded.exp * 1000) - now;
+      setTimeout(() => {
+        console.log("Vous allez être deconnecter dans 3 seconde.");
+      }, expireIn - 3000);
+      setTimeout(() => {
+        this.logout();
+      }, expireIn);
+    }
+  }
+
+
+  
+
 }
