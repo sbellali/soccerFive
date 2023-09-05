@@ -22,87 +22,49 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class UserService implements UserDetailsService {
 
-  @Autowired
-  private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-  @Autowired
-  private ModelMapper modelMapper;
+    @Autowired
+    private ModelMapper modelMapper;
 
-  @Autowired
-  private S3Service s3Service;
+    @Autowired
+    private S3Service s3Service;
 
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return userRepository.findByUsername(username)
-            .orElseThrow(() -> new UsernameNotFoundException("user is not valid"));
-  }
-
-  public ResponseEntity<?> findUserById(Integer id) {
-    try {
-      User user = userRepository.getReferenceById(id);
-      UserDTO userDTO = modelMapper.map(user, UserDTO.class);
-      return ResponseEntity.ok().body(userDTO);
-    } catch (Exception EntityNotFoundException) {
-      HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-      ErrorMessage errorMessage = new ErrorMessage(
-              httpStatus.value(),
-              "Unable to find a user with id " + id);
-
-      return ResponseEntity
-              .status(httpStatus)
-              .body(errorMessage);
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("user is not valid"));
     }
 
-  }
-
-  public String createPhotoUrl(Integer id, MultipartFile photo) {
-    System.out.println("Type de fichier : " + photo.getContentType());
-    String contentType = photo.getContentType();
-    if (contentType == null || !contentType.startsWith("image/"))
-      throw new BadContentTypeException(contentType);
-
-    String profileImagePath = "user/" + id + "/" + UUID.randomUUID().toString() + photo.getOriginalFilename();
-    User user = userRepository.getReferenceById(id);
-    user.setPhotoUrl(profileImagePath);
-    this.userRepository.save(user);
-
-    return profileImagePath;
-  }
-
-  public ResponseEntity<?> uploadProfileImage(Integer id, MultipartFile file) {
-
-    try {
-      String profileImagePath = this.createPhotoUrl(id, file);
-      this.s3Service.putObject(profileImagePath, file.getBytes());
-    } catch (IOException e) {
-      HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-      ErrorMessage errorMessage = new ErrorMessage(
-              httpStatus.value(),
-              "Internal server error");
-
-      return ResponseEntity
-              .status(httpStatus)
-              .body(errorMessage);
-    } catch (BadContentTypeException e) {
-      HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-      ErrorMessage errorMessage = new ErrorMessage(
-              httpStatus.value(),
-              e.getMessage());
-
-      return ResponseEntity
-              .status(httpStatus)
-              .body(errorMessage);
+    public UserDTO findUserById(Integer id) {
+        User user = userRepository.getReferenceById(id);
+        return modelMapper.map(user, UserDTO.class);
     }
 
-    return ResponseEntity.ok("");
-  }
+    public String createPhotoUrl(Integer id, MultipartFile photo) {
+        System.out.println("Type de fichier : " + photo.getContentType());
+        String contentType = photo.getContentType();
+        if (contentType == null || !contentType.startsWith("image/"))
+            throw new BadContentTypeException(contentType);
 
-  public ResponseEntity<?> downloadProfileImage(Integer id) {
+        String profileImagePath = "user/" + id + "/" + UUID.randomUUID().toString() + photo.getOriginalFilename();
+        User user = userRepository.getReferenceById(id);
+        user.setPhotoUrl(profileImagePath);
+        this.userRepository.save(user);
 
-    User user = this.userRepository.getReferenceById(id);
-    String photoUrl = user.getPhotoUrl();
-    byte[] photo = this.s3Service.getObject(photoUrl);
+        return profileImagePath;
+    }
 
-    return ResponseEntity.ok(photo);
-  }
+    public void uploadProfileImage(Integer id, MultipartFile file) throws IOException {
+        String profileImagePath = this.createPhotoUrl(id, file);
+        this.s3Service.putObject(profileImagePath, file.getBytes());
+    }
+
+    public byte[] downloadProfileImage(Integer id) {
+
+        User user = this.userRepository.getReferenceById(id);
+        String photoUrl = user.getPhotoUrl();
+        return this.s3Service.getObject(photoUrl);
+    }
 }
