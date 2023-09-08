@@ -1,6 +1,5 @@
 package com.sbellali.soccerFive.service;
 
-import com.sbellali.soccerFive.dto.ErrorMessage;
 import com.sbellali.soccerFive.dto.UserDTO;
 import com.sbellali.soccerFive.exception.BadContentTypeException;
 import com.sbellali.soccerFive.model.User;
@@ -11,8 +10,6 @@ import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
