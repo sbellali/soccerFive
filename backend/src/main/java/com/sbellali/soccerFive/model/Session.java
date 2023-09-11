@@ -3,6 +3,8 @@ package com.sbellali.soccerFive.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.sbellali.soccerFive.validator.SessionDuration.ValidSessionDuration;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,6 +14,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,8 +30,12 @@ public class Session {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private LocalDateTime startTime;
-    private LocalDateTime endTime;
+
+    @ValidSessionDuration
+    private double duration = 1.5;
     private String location;
+
+    @Max(12)
     private int maxParticipants;
     private double price;
     private String description;

@@ -1,7 +1,7 @@
 spring:
     jpa:
         database-platform: org.hibernate.dialect.MySQL8Dialect
-        hibernate.ddl-auto: update
+        hibernate.ddl-auto: create
     datasource:
         url: jdbc:mysql://db:3306/soccerFiveDB
         username: admin

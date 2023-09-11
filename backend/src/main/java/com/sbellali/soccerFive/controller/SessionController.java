@@ -4,11 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sbellali.soccerFive.exception.SessionNotFoundException;
 import com.sbellali.soccerFive.service.SessionService;
 
 import jakarta.validation.constraints.Pattern;
@@ -22,14 +27,9 @@ public class SessionController extends AbsractController {
     @Autowired
     private SessionService sessionService;
 
-    @GetMapping(value = "/")
-    public ResponseEntity<?> getAllSessions() {
-        return this.successResponse(this.sessionService.getAllSessions());
-    }
-
-    @GetMapping(value = "/date/{date}")
+    @GetMapping(value = "/", params = "dateStart")
     public ResponseEntity<?> getSessionsByDate(
-            @PathVariable(name = "date") @Pattern(regexp = "^(0[1-9]|[1-2][0-9]|3[0-1])-(0[1-9]|1[0-2])-\\d{4}$") String date) {
+            @RequestParam(name = "dateStart") @Pattern(regexp = "^(0[1-9]|[1-2][0-9]|3[0-1])-(0[1-9]|1[0-2])-\\d{4}$") String date) {
         ResponseEntity<?> response;
         try {
             response = this.successResponse(this.sessionService.getSessionsByDate(date));
@@ -37,6 +37,42 @@ public class SessionController extends AbsractController {
             response = this.errorResponse();
         }
         return response;
+    }
+
+    @GetMapping(value = "/")
+    public ResponseEntity<?> getAllSessions() {
+        return this.successResponse(this.sessionService.getAllSessions());
+    }
+
+    // TODO: Implementation
+    @PostMapping(value = "/")
+    public ResponseEntity<?> createSession(@PathVariable(name = "id") Integer id) {
+        return null;
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<?> getSession(@PathVariable(name = "id") Integer id) {
+        ResponseEntity<?> response;
+        try {
+            response = this.successResponse(this.sessionService.getSession(id));
+        } catch (SessionNotFoundException e) {
+            response = this.errorResponse(e.getHttpStatus(), e);
+        } catch (Exception e) {
+            response = this.errorResponse();
+        }
+        return response;
+    }
+
+    // TODO: Implementation
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<?> modifySession(@PathVariable(name = "id") Integer id) {
+        return null;
+    }
+
+    // TODO: Implementation
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> getAllSessions(@PathVariable(name = "id") Integer id) {
+        return null;
     }
 
 }

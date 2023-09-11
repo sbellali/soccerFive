@@ -63,7 +63,7 @@ public class SoccerFiveApplication {
 		List<User> players = new ArrayList<>();
 
 		session1.setStartTime(LocalDateTime.now());
-		session1.setEndTime(LocalDateTime.now().plusHours(2));
+		session1.setDuration(2.0);
 		session1.setLocation("Soccer Field 1");
 		session1.setMaxParticipants(10);
 		session1.setPrice(20.0);
@@ -75,7 +75,7 @@ public class SoccerFiveApplication {
 
 		Session session2 = new Session();
 		session2.setStartTime(LocalDateTime.now().plusDays(1));
-		session2.setEndTime(LocalDateTime.now().plusDays(1).plusHours(2));
+		session2.setDuration(1.5);
 		session2.setLocation("Soccer Field 2");
 		session2.setMaxParticipants(15);
 		session2.setPrice(25.0);
