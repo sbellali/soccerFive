@@ -36,7 +36,7 @@ public class Session {
     private String location;
 
     @Max(12)
-    private int maxParticipants;
+    private int maxPlayers;
     private double price;
     private String description;
 

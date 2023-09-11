@@ -65,7 +65,7 @@ public class SoccerFiveApplication {
 		session1.setStartTime(LocalDateTime.now());
 		session1.setDuration(2.0);
 		session1.setLocation("Soccer Field 1");
-		session1.setMaxParticipants(10);
+		session1.setMaxPlayers(10);
 		session1.setPrice(20.0);
 		session1.setDescription("Soccer practice session");
 		session1.setOrganizer(organizer);
@@ -77,7 +77,7 @@ public class SoccerFiveApplication {
 		session2.setStartTime(LocalDateTime.now().plusDays(1));
 		session2.setDuration(1.5);
 		session2.setLocation("Soccer Field 2");
-		session2.setMaxParticipants(15);
+		session2.setMaxPlayers(12);
 		session2.setPrice(25.0);
 		session2.setDescription("Friendly soccer match");
 		session2.setOrganizer(organizer);

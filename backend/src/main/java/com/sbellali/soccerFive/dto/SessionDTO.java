@@ -20,7 +20,7 @@ public class SessionDTO {
     @ValidSessionDuration
     private double duration;
     private String location;
-    private int maxParticipants;
+    private int maxPlayers;
     private double price;
     private String description;
     private UserDTO organizer;
