@@ -53,9 +53,4 @@ public class UserController extends AbsractController {
         return response;
     }
 
-    @RequestMapping("/")
-    public String HelloAdmin() {
-        return "User Level";
-    }
-
 }

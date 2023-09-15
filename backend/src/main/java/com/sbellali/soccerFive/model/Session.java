@@ -53,6 +53,14 @@ public class Session {
         }
     }
 
+    public void removePlayer(User player) {
+        this.players.removeIf((user) -> user.getId() == player.getId());
+    }
+
+    public void removePlayers(List<Integer> playersId) {
+        this.players.removeIf((user) -> playersId.contains(user.getId()));
+    }
+
     public boolean isPlayerInList(User player) {
         return this.players.stream().anyMatch(p -> p.getId().equals(player.getId()));
     }

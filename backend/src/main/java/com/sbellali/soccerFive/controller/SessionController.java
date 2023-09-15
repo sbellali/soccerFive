@@ -1,5 +1,7 @@
 package com.sbellali.soccerFive.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -117,7 +119,7 @@ public class SessionController extends AbsractController {
         return response;
     }
 
-    @PutMapping(value = "/{id}/add-player")
+    @PostMapping(value = "/{id}/player")
     public ResponseEntity<?> addPlayer(Authentication auth, @PathVariable(name = "id") Integer id) {
         ResponseEntity<?> response;
         User user = (User) auth.getPrincipal();
@@ -131,7 +133,36 @@ public class SessionController extends AbsractController {
         return response;
     }
 
-    // TODO remove player
-    // TODO remove player by organizer
+    @DeleteMapping(value = "/{id}/player")
+    public ResponseEntity<?> removePlayer(Authentication auth, @PathVariable(name = "id") Integer id) {
+        ResponseEntity<?> response;
+        User user = (User) auth.getPrincipal();
+        try {
+            response = this.successResponse(this.sessionService.removePlayerFromSession(id, user));
+        } catch (SessionNotFoundException e) {
+            response = this.errorResponse(e);
+        } catch (Exception e) {
+            response = this.errorResponse();
+        }
+        return response;
+    }
+
+    @DeleteMapping(value = "/{id}/players")
+    public ResponseEntity<?> removePlayers(
+            Authentication auth,
+            @RequestBody List<Integer> ids,
+            @PathVariable(name = "id") Integer id) {
+
+        ResponseEntity<?> response;
+        User user = (User) auth.getPrincipal();
+        try {
+            response = this.successResponse(this.sessionService.removePlayersFromSession(id, user, ids));
+        } catch (SessionNotFoundException | UnauthorizedActionException e) {
+            response = this.errorResponse(e);
+        } catch (Exception e) {
+            response = this.errorResponse();
+        }
+        return response;
+    }
 
 }

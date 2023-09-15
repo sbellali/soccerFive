@@ -85,6 +85,21 @@ public class SessionService {
         return this.saveAndGetDtoSession(session);
     }
 
+    public SessionDTO removePlayerFromSession(int id, User player) {
+        Session session = sessionRepository.findById(id).orElseThrow(() -> new SessionNotFoundException());
+        session.removePlayer(player);
+        return this.saveAndGetDtoSession(session);
+    }
+
+    public SessionDTO removePlayersFromSession(int id, User organizer, List<Integer> usersId) {
+        Session session = sessionRepository.findById(id).orElseThrow(() -> new SessionNotFoundException());
+        if (!this.isOrganizerofSession(session, organizer)) {
+            throw new UnauthorizedActionException();
+        }
+        session.removePlayers(usersId);
+        return this.saveAndGetDtoSession(session);
+    }
+
     public boolean isOrganizerofSession(Session session, User organizer) {
         Integer sessionOrganizerId = session.getOrganizer().getId();
         Integer organizerId = organizer.getId();
