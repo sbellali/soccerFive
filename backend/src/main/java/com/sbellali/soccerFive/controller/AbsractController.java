@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.sbellali.soccerFive.dto.ErrorMessage;
+import com.sbellali.soccerFive.exception.CustomHttpException;
 
 public class AbsractController {
 
@@ -17,6 +18,10 @@ public class AbsractController {
 
     protected ResponseEntity<?> errorResponse() {
         return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
+    }
+
+    protected ResponseEntity<?> errorResponse(CustomHttpException e) {
+        return errorResponse(e.getHttpStatus(), e.getMessage());
     }
 
     protected ResponseEntity<?> errorResponse(HttpStatus httpStatus, Exception e) {

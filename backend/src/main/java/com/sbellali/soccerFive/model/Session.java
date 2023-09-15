@@ -47,4 +47,14 @@ public class Session {
     @JoinTable(name = "session_players_junction", joinColumns = @JoinColumn(name = "session_id"), inverseJoinColumns = @JoinColumn(name = "player_id"))
     private List<User> players;
 
+    public void addPlayer(User player) {
+        if (!isPlayerInList(player)) {
+            this.players.add(player);
+        }
+    }
+
+    public boolean isPlayerInList(User player) {
+        return this.players.stream().anyMatch(p -> p.getId().equals(player.getId()));
+    }
+
 }

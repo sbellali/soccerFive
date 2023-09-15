@@ -3,6 +3,7 @@ package com.sbellali.soccerFive.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sbellali.soccerFive.validator.SessionDuration.ValidSessionDuration;
 
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class SessionDTO {
 
     private Integer id;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startTime;
 
     @ValidSessionDuration

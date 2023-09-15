@@ -11,9 +11,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.sbellali.soccerFive.dto.SessionCreateRequestDTO;
+import com.sbellali.soccerFive.dto.SessionRequestDTO;
 import com.sbellali.soccerFive.dto.SessionDTO;
+import com.sbellali.soccerFive.exception.MaxPlayersReachedException;
 import com.sbellali.soccerFive.exception.SessionNotFoundException;
+import com.sbellali.soccerFive.exception.UnauthorizedActionException;
 import com.sbellali.soccerFive.model.Session;
 import com.sbellali.soccerFive.model.User;
 import com.sbellali.soccerFive.repository.SessionRepository;
@@ -29,7 +31,7 @@ public class SessionService {
 
     public List<SessionDTO> getAllSessions() {
         return sessionRepository.findAll().stream()
-                .map(session -> modelMapper.map(session, SessionDTO.class))
+                .map(session -> this.sessionToDTO(session))
                 .toList();
     }
 
@@ -39,21 +41,68 @@ public class SessionService {
         LocalDateTime startOfDay = LocalDate.parse(date, formatter).atStartOfDay();
         LocalDateTime endOfDay = LocalDate.parse(date, formatter).atTime(LocalTime.MAX);
         return sessionRepository.findByStartTimeBetween(startOfDay, endOfDay).stream()
-                .map(session -> modelMapper.map(session, SessionDTO.class))
+                .map(session -> this.sessionToDTO(session))
                 .toList();
 
     }
 
     public SessionDTO getSession(Integer id) {
         Session session = sessionRepository.findById(id).orElseThrow(() -> new SessionNotFoundException());
-        return modelMapper.map(session, SessionDTO.class);
+        return this.sessionToDTO(session);
     }
 
-    public SessionDTO createSession(SessionCreateRequestDTO sessionCreateRequest, User organizer) {
+    public SessionDTO createSession(SessionRequestDTO sessionCreateRequest, User organizer) {
         Session newSession = modelMapper.map(sessionCreateRequest, Session.class);
         newSession.setOrganizer(organizer);
         newSession.setPlayers(new ArrayList<User>());
-        return modelMapper.map(sessionRepository.save(newSession), SessionDTO.class);
+        return this.saveAndGetDtoSession(newSession);
+    }
+
+    public SessionDTO modifySession(int id, SessionRequestDTO sessionCreateRequest, User organizer) {
+        Session session = sessionRepository.findById(id).orElseThrow(() -> new SessionNotFoundException());
+        if (!this.isOrganizerofSession(session, organizer)) {
+            throw new UnauthorizedActionException();
+        }
+        modelMapper.map(sessionCreateRequest, session);
+        return this.saveAndGetDtoSession(session);
+    }
+
+    public void deleteSession(int id, User organizer) {
+        Session session = sessionRepository.findById(id).orElseThrow(() -> new SessionNotFoundException());
+        if (!this.isOrganizerofSession(session, organizer)) {
+            throw new UnauthorizedActionException();
+        }
+
+        sessionRepository.deleteById(id);
+    }
+
+    public SessionDTO addPlayerToSession(int id, User player) {
+        Session session = sessionRepository.findById(id).orElseThrow(() -> new SessionNotFoundException());
+        if (this.hasReachedMaxPlayers(session)) {
+            throw new MaxPlayersReachedException();
+        }
+        session.addPlayer(player);
+        return this.saveAndGetDtoSession(session);
+    }
+
+    public boolean isOrganizerofSession(Session session, User organizer) {
+        Integer sessionOrganizerId = session.getOrganizer().getId();
+        Integer organizerId = organizer.getId();
+
+        return sessionOrganizerId.equals(organizerId);
+    }
+
+    public boolean hasReachedMaxPlayers(Session session) {
+        return session.getPlayers().size() > session.getMaxPlayers();
+    }
+
+    private SessionDTO saveAndGetDtoSession(Session session) {
+        Session savedSession = sessionRepository.save(session);
+        return this.sessionToDTO(savedSession);
+    }
+
+    private SessionDTO sessionToDTO(Session session) {
+        return modelMapper.map(session, SessionDTO.class);
     }
 
 }

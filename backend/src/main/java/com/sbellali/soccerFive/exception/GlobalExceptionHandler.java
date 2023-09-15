@@ -19,25 +19,25 @@ import com.sbellali.soccerFive.dto.ErrorMessage;
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request) {
-        Map<String, List<String>> body = new HashMap<>();
+        @Override
+        protected ResponseEntity<Object> handleMethodArgumentNotValid(
+                        MethodArgumentNotValidException ex,
+                        HttpHeaders headers,
+                        HttpStatusCode status,
+                        WebRequest request) {
+                Map<String, List<String>> body = new HashMap<>();
 
-        List<String> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.toList());
+                List<String> errors = ex.getBindingResult()
+                                .getFieldErrors()
+                                .stream()
+                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                .collect(Collectors.toList());
 
-        body.put("errors", errors);
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        return ResponseEntity
-                .status(httpStatus)
-                .body(new ErrorMessage(httpStatus.value(), String.join("; ", errors)));
+                body.put("errors", errors);
+                HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+                return ResponseEntity
+                                .status(httpStatus)
+                                .body(new ErrorMessage(httpStatus.value(), String.join("; ", errors)));
 
-    }
+        }
 }

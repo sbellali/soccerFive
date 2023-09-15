@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sbellali.soccerFive.dto.SessionCreateRequestDTO;
+import com.sbellali.soccerFive.dto.SessionRequestDTO;
+import com.sbellali.soccerFive.exception.MaxPlayersReachedException;
 import com.sbellali.soccerFive.exception.SessionNotFoundException;
+import com.sbellali.soccerFive.exception.UnauthorizedActionException;
 import com.sbellali.soccerFive.model.User;
 import com.sbellali.soccerFive.service.SessionService;
 
@@ -54,8 +56,7 @@ public class SessionController extends AbsractController {
     @PostMapping(value = "/")
     public ResponseEntity<?> createSession(
             Authentication auth,
-            @Valid @RequestBody SessionCreateRequestDTO sessionCreateRequest) {
-
+            @Valid @RequestBody SessionRequestDTO sessionCreateRequest) {
         ResponseEntity<?> response;
         User user = (User) auth.getPrincipal();
         try {
@@ -63,7 +64,7 @@ public class SessionController extends AbsractController {
                     HttpStatus.CREATED,
                     sessionService.createSession(sessionCreateRequest, user));
         } catch (SessionNotFoundException e) {
-            response = this.errorResponse(e.getHttpStatus(), e);
+            response = this.errorResponse(e);
         } catch (Exception e) {
             response = this.errorResponse();
         }
@@ -76,23 +77,61 @@ public class SessionController extends AbsractController {
         try {
             response = this.successResponse(this.sessionService.getSession(id));
         } catch (SessionNotFoundException e) {
-            response = this.errorResponse(e.getHttpStatus(), e);
+            response = this.errorResponse(e);
         } catch (Exception e) {
             response = this.errorResponse();
         }
         return response;
     }
 
-    // TODO: Implementation
     @PutMapping(value = "/{id}")
-    public ResponseEntity<?> modifySession(@PathVariable(name = "id") Integer id) {
-        return null;
+    public ResponseEntity<?> modifySession(
+            Authentication auth,
+            @Valid @RequestBody SessionRequestDTO sessionCreateRequest,
+            @PathVariable(name = "id") Integer id) {
+        ResponseEntity<?> response;
+        User user = (User) auth.getPrincipal();
+        try {
+            response = this.successResponse(this.sessionService.modifySession(id, sessionCreateRequest, user));
+        } catch (SessionNotFoundException | UnauthorizedActionException e) {
+            response = this.errorResponse(e);
+        } catch (Exception e) {
+            response = this.errorResponse();
+        }
+        return response;
     }
 
-    // TODO: Implementation
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> getAllSessions(@PathVariable(name = "id") Integer id) {
-        return null;
+    public ResponseEntity<?> deleteSession(Authentication auth, @PathVariable(name = "id") Integer id) {
+        ResponseEntity<?> response;
+        User user = (User) auth.getPrincipal();
+        try {
+            this.sessionService.deleteSession(id, user);
+            response = this.successResponse("Session successfully deleted.");
+        } catch (SessionNotFoundException | UnauthorizedActionException e) {
+            response = this.errorResponse(e);
+        } catch (Exception e) {
+            response = this.errorResponse();
+        }
+
+        return response;
     }
+
+    @PutMapping(value = "/{id}/add-player")
+    public ResponseEntity<?> addPlayer(Authentication auth, @PathVariable(name = "id") Integer id) {
+        ResponseEntity<?> response;
+        User user = (User) auth.getPrincipal();
+        try {
+            response = this.successResponse(this.sessionService.addPlayerToSession(id, user));
+        } catch (SessionNotFoundException | MaxPlayersReachedException e) {
+            response = this.errorResponse(e);
+        } catch (Exception e) {
+            response = this.errorResponse();
+        }
+        return response;
+    }
+
+    // TODO remove player
+    // TODO remove player by organizer
 
 }
