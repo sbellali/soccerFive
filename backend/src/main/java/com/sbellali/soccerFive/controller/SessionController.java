@@ -37,7 +37,7 @@ public class SessionController extends AbsractController {
     @Autowired
     private SessionService sessionService;
 
-    @GetMapping(value = "/", params = "dateStart")
+    @GetMapping(value = "", params = "dateStart")
     public ResponseEntity<?> getSessionsByDate(
             @RequestParam(name = "dateStart") @Pattern(regexp = "^(0[1-9]|[1-2][0-9]|3[0-1])-(0[1-9]|1[0-2])-\\d{4}$") String date) {
 
@@ -50,12 +50,12 @@ public class SessionController extends AbsractController {
         return response;
     }
 
-    @GetMapping(value = "/")
+    @GetMapping(value = "")
     public ResponseEntity<?> getAllSessions() {
         return this.successResponse(this.sessionService.getAllSessions());
     }
 
-    @PostMapping(value = "/")
+    @PostMapping(value = "")
     public ResponseEntity<?> createSession(
             Authentication auth,
             @Valid @RequestBody SessionRequestDTO sessionCreateRequest) {
