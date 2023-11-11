@@ -9,16 +9,14 @@ services:
       target: developement
       args:
         - JAVA_VERSION_TAG
-        - UID
-        - GID
     environment:
       - AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY
       - AWS_S3_BUCKET_NAME
       - JWT_SECRET_KEY
     volumes:
-      - backend-jar-volume:/usr/jar
-    user: $UID:$GID
+      - ./backend:/usr/app
+      - m2-repo:/root/.m2
     ports:
       - ${BACK_PORT}:8080
     links:
@@ -67,22 +65,5 @@ services:
     ports:
       - ${PMA_PORT}:80
 
-  # build and package services
-  backend_package:
-    image: ${APP_NAME}/backend:package
-    build:
-      context: ./backend
-      target: package
-      args:
-        - UID
-        - GID
-    environment:
-      - MVN_SKIP_TEST=true
-    user: $UID:$GID
-    volumes:
-      - ./backend:/usr/app
-      - backend-jar-volume:/usr/jar
-      - ./backend/.m2:/usr/.m2
-
 volumes:
-  backend-jar-volume:
+  m2-repo:
